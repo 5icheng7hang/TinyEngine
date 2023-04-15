@@ -231,7 +231,7 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args) {
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
 
-    if (componentId >= componentPools.size()) {
+    if (componentId >= static_cast<int>(componentPools.size())) {
         componentPools.resize(componentId + 1, nullptr);
     }
 
@@ -252,7 +252,7 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args) {
 
     entityComponentSignatures[entityId].set(componentId);
 
-    Logger::Log("Component id = " + std::to_string(componentId) + "Added to entity " + std::to_string(entityId));
+    Logger::Log("Component id = " + std::to_string(componentId) + " Added to entity " + std::to_string(entityId));
 }
 
 template <typename TComponent>
@@ -260,10 +260,12 @@ void Registry::RemoveComponent(Entity entity) {
 	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
 	entityComponentSignatures[entityId].set(componentId, false);
+
+	Logger::Log("Component id = " + std::to_string(componentId) + " Removed from entity " + std::to_string(entityId));
 }
 
 template <typename TComponent>
-bool Registry::HasComp.............................onent(Entity entity) const {
+bool Registry::HasComponent(Entity entity) const {
 	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
 	return entityComponentSignatures[entityId].test(componentId);
