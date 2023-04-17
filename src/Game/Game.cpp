@@ -3,23 +3,31 @@
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/SpriteComponent.h"
+#include "../Systems/MovementSystem.h"
+#include "../Systems/RenderSystem.h"
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
 #include <iostream>
 
-Game::Game() {
+Game::Game() 
+{
     isRunning = false;
     registry = std::make_unique<Registry>();
     Logger::Log("Game constructor called!");
 }
 
-Game::~Game() {
+Game::~Game() 
+{
     Logger::Log("Game destructor called!");   
 }
 
-void Game::Initialize() {
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+void Game::Initialize() 
+{
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
+    {
         Logger::Err("Error initializing SDL.");
         return;
     }
@@ -35,12 +43,14 @@ void Game::Initialize() {
         windowHeight,
         SDL_WINDOW_BORDERLESS
     );
-    if (!window) {
+    if (!window) 
+    {
         Logger::Err("Error creating SDL window.");
         return;
     }
     renderer = SDL_CreateRenderer(window, -1, 0);
-    if (!renderer) {
+    if (!renderer) 
+    {
         Logger::Err("Error creating SDL renderer.");
         return;
     }
@@ -48,15 +58,18 @@ void Game::Initialize() {
     isRunning = true;
 }
 
-void Game::ProcessInput() {
+void Game::ProcessInput() 
+{
     SDL_Event sdlEvent;
-    while (SDL_PollEvent(&sdlEvent)) {
+    while (SDL_PollEvent(&sdlEvent)) 
+    {
         switch (sdlEvent.type) {
             case SDL_QUIT:
                 isRunning = false;
                 break;
             case SDL_KEYDOWN:
-                if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
+                if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) 
+                {
                     isRunning = false;
                 }
                 break;
@@ -64,20 +77,27 @@ void Game::ProcessInput() {
     }
 }
 
-void Game::Setup() {
+void Game::Setup() 
+{
+    // Add system.
+    registry->AddSystem<MovementSystem>();
+    registry->AddSystem<RenderSystem>();
+
     // Create some entities
 	Entity tank = registry->CreateEntity();
 
     // Add some components
     tank.AddComponent<TransformComponent>(glm::vec2(10.f, 30.f), glm::vec2(1.f, 1.f), 0.f);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(50.f, 0.f));
-    tank.RemoveComponent<TransformComponent>();
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(50.f, 50.f));
+    tank.AddComponent<SpriteComponent>(10, 10);
 }
 
-void Game::Update() {
+void Game::Update() 
+{
     // If we are too fast, waste some time until we reach the MILLISECS_PER_FRAME
     int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecsPreviousFrame);
-    if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) {
+    if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) 
+    {
         SDL_Delay(timeToWait);
     }
 
@@ -86,23 +106,28 @@ void Game::Update() {
 
     // Store the "previous" frame time
     millisecsPreviousFrame = SDL_GetTicks();
-    
-    // TODO:
-    // MovementSystem.Update();
-    // CollisionSystem.Update();
-    // DamageSystem.Update();
+
+    // update registry to process entities waiting to be created or deleted
+    registry->Update();
+
+
+	// TODO: Update all system.
+	registry->GetSystem<MovementSystem>().Update(deltaTime);
 }
 
-void Game::Render() {
+void Game::Render() 
+{
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
     // TODO: Render game objects...
+	registry->GetSystem<RenderSystem>().Update(renderer);
 
     SDL_RenderPresent(renderer);
 }
 
-void Game::Run() {
+void Game::Run() 
+{
     Setup();
     while (isRunning) {
         ProcessInput();
@@ -111,7 +136,8 @@ void Game::Run() {
     }
 }
 
-void Game::Destroy() {
+void Game::Destroy() 
+{
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

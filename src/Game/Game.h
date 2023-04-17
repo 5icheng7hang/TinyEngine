@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "../ECS/ECS.h"
 #include <SDL.h>
@@ -7,7 +6,8 @@
 const int FPS = 60;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
 
-class Game {
+class Game 
+{
     private:
         bool isRunning;
         int millisecsPreviousFrame = 0;
@@ -30,5 +30,3 @@ class Game {
         int windowWidth;
         int windowHeight;
 };
-
-#endif
