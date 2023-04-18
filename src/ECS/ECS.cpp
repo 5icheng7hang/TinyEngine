@@ -2,6 +2,8 @@
 #include "../Logger/Logger.h"
 #include <algorithm>
 
+// this is from work space.
+
 int IComponent::nextId = 0;
 
 int Entity::GetId() const 
