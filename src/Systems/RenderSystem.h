@@ -4,6 +4,8 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../AssetStore/Assetstore.h"
+
 #include <SDL.h>
 
 class RenderSystem : public System 
@@ -15,7 +17,7 @@ public:
 		RequireComponent<SpriteComponent>();
 	}
 
-	void Update(SDL_Renderer* renderer) 
+	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) 
 	{
 		// Loop all entities that the system is interested in
 		for (auto entity : GetSystemEntities()) 
@@ -24,15 +26,37 @@ public:
 			const auto transform = entity.GetComponent<TransformComponent>();
 			const auto sprite = entity.GetComponent<SpriteComponent>();
 
-			SDL_Rect objRect =
-			{
+			//SDL_Rect objRect =
+			//{
+			//	static_cast<int>(transform.position.x),
+			//	static_cast<int>(transform.position.y),
+			//	sprite.width,
+			//	sprite.height
+			//};
+			//SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+			//SDL_RenderFillRect(renderer, &objRect);
+
+			//TODO: draw png rather than rect
+
+
+			// Set source and destnation rect
+			SDL_Rect srcRect = sprite.srcRect;
+			SDL_Rect dstRect = {
 				static_cast<int>(transform.position.x),
 				static_cast<int>(transform.position.y),
-				sprite.width,
-				sprite.height
+				static_cast<int>(sprite.width * transform.scale.x),
+				static_cast<int>(sprite.height * transform.scale.y)
 			};
-			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			SDL_RenderFillRect(renderer, &objRect);
+
+			SDL_RenderCopyEx(
+				renderer,
+				assetStore->GetTexture(sprite.assetId),
+				&srcRect,
+				&dstRect,
+				transform.rotation,
+				NULL,
+				/* not do flip here. */
+				SDL_FLIP_NONE);
 		}
 	}
 };
