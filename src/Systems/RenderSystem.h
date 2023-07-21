@@ -26,19 +26,6 @@ public:
 			const auto transform = entity.GetComponent<TransformComponent>();
 			const auto sprite = entity.GetComponent<SpriteComponent>();
 
-			//SDL_Rect objRect =
-			//{
-			//	static_cast<int>(transform.position.x),
-			//	static_cast<int>(transform.position.y),
-			//	sprite.width,
-			//	sprite.height
-			//};
-			//SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			//SDL_RenderFillRect(renderer, &objRect);
-
-			//TODO: draw png rather than rect
-
-
 			// Set source and destnation rect
 			SDL_Rect srcRect = sprite.srcRect;
 			SDL_Rect dstRect = {

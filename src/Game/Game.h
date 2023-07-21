@@ -23,6 +23,7 @@ class Game
         ~Game();
         void Initialize();
         void Run();
+        void LoadLevel(int LevelId);
         void Setup();
         void ProcessInput();
         void Update();
