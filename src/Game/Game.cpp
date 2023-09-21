@@ -5,9 +5,11 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
+#include "../Components/ColliderComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
+#include "../Systems/CollisionSystem.h"
 #include "../AssetStore/Assetstore.h"
 
 #include <SDL.h>
@@ -39,8 +41,8 @@ void Game::Initialize()
     }
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
-    windowWidth = displayMode.w;
-    windowHeight = displayMode.h;
+    windowWidth = 1024;  //displayMode.w;
+    windowHeight = 768; // displayMode.h;
     window = SDL_CreateWindow(
         NULL,
         SDL_WINDOWPOS_CENTERED,
@@ -60,7 +62,7 @@ void Game::Initialize()
         Logger::Err("Error creating SDL renderer.");
         return;
     }
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
     isRunning = true;
 }
 
@@ -89,6 +91,7 @@ void Game::LoadLevel(int LevelId)
 	registry->AddSystem<MovementSystem>();
 	registry->AddSystem<RenderSystem>();
     registry->AddSystem<AnimationSystem>();
+    registry->AddSystem<CollisionSystem>();
 
 	// Add assets to asset store
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -140,7 +143,8 @@ void Game::LoadLevel(int LevelId)
 	//Entity tank = registry->CreateEntity();
 	//Entity truck = registry->CreateEntity();
     Entity chopper = registry->CreateEntity();
-    Entity radar = registry->CreateEntity();
+    Entity chopper2 = registry->CreateEntity();
+    //Entity radar = registry->CreateEntity();
 
 	// Add some components
 	//tank.AddComponent<TransformComponent>(glm::vec2(10.f, 30.f), glm::vec2(10.f, 10.f), 45.f);
@@ -153,16 +157,21 @@ void Game::LoadLevel(int LevelId)
 	//truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 3);
 
 
-    chopper.AddComponent<TransformComponent>(glm::vec2(10.f, 30.f), glm::vec2(10.f, 10.f), 45.f);
-    chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.f, 0.f));
+    chopper.AddComponent<TransformComponent>(glm::vec2(10.f, 30.f), glm::vec2(3.f, 3.f), 0.f);
+    chopper.AddComponent<RigidBodyComponent>(glm::vec2(20.f, 0.f));
     chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 5);
     chopper.AddComponent<AnimationComponent>(2, 5,  true);
+    chopper.AddComponent<ColliderComponent>(10, 10);
 
-
-	radar.AddComponent<TransformComponent>(glm::vec2(500, 300.f), glm::vec2(5.f, 5.f));
-	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.f, 0.f));
-	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 5);
-	radar.AddComponent<AnimationComponent>(8, 5, true);
+    chopper2.AddComponent<TransformComponent>(glm::vec2(500.f, 30.f), glm::vec2(3.f, 3.f), 0.f);
+    chopper2.AddComponent<RigidBodyComponent>(glm::vec2(-20.f, 0.f));
+    chopper2.AddComponent<SpriteComponent>("chopper-image", 32, 32, 5);
+    chopper2.AddComponent<AnimationComponent>(2, 5, true);
+    chopper2.AddComponent<ColliderComponent>(10, 10);
+	//radar.AddComponent<TransformComponent>(glm::vec2(500, 300.f), glm::vec2(5.f, 5.f));
+	//radar.AddComponent<RigidBodyComponent>(glm::vec2(0.f, 0.f));
+	//radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 5);
+	//radar.AddComponent<AnimationComponent>(8, 5, true);
 
 }
 
@@ -194,6 +203,7 @@ void Game::Update()
 	// TODO: Update all system.
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
     registry->GetSystem<AnimationSystem>().Update();
+    registry->GetSystem<CollisionSystem>().Update();
 }
 
 void Game::Render() 
