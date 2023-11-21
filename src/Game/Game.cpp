@@ -10,6 +10,7 @@
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
+#include "../Systems/CollisionDebugSystem.h"
 #include "../AssetStore/Assetstore.h"
 
 #include <SDL.h>
@@ -80,6 +81,10 @@ void Game::ProcessInput()
                 {
                     isRunning = false;
                 }
+                if (sdlEvent.key.keysym.sym == SDLK_d)
+                {
+                    isDebug = !isDebug;
+                }
                 break;
         }
     }
@@ -92,6 +97,7 @@ void Game::LoadLevel(int LevelId)
 	registry->AddSystem<RenderSystem>();
     registry->AddSystem<AnimationSystem>();
     registry->AddSystem<CollisionSystem>();
+    registry->AddSystem<CollisionDebugSystem>();
 
 	// Add assets to asset store
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -213,7 +219,10 @@ void Game::Render()
 
     // TODO: Render game objects...
 	registry->GetSystem<RenderSystem>().Update(renderer, assetStore);
-
+    if (isDebug)
+    {
+        registry->GetSystem<CollisionDebugSystem>().Update(renderer);
+    }
     SDL_RenderPresent(renderer);
 }
 
