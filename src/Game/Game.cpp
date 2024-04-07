@@ -149,7 +149,7 @@ void Game::LoadLevel(int LevelId)
     Entity chopper = registry->CreateEntity();
     Entity chopper2 = registry->CreateEntity();
     Entity CollisionArea = registry->CreateEntity();
-
+    Entity radar = registry->CreateEntity();
 
     // init components.
     chopper.AddComponent<TransformComponent>(glm::vec2(10.f, 30.f), glm::vec2(3.f, 3.f), 0.f);
@@ -166,6 +166,14 @@ void Game::LoadLevel(int LevelId)
 
     CollisionArea.AddComponent<TransformComponent>(glm::vec2(200.f, 30.f), glm::vec2(20.f, 20.f), 0.f);
     CollisionArea.AddComponent<ColliderComponent>(200, 20);
+
+	radar.AddComponent<TransformComponent>(glm::vec2(500, 300.f), glm::vec2(1.f, 1.f));
+	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.f, 0.f));
+	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 5);
+	radar.AddComponent<AnimationComponent>(8, 5, true);
+
+
+    // chopper.Kill();
 }
 
 
