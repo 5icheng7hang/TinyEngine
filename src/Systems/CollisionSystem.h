@@ -17,6 +17,13 @@ public:
 	void Update() 
 	{
 		auto entities = GetSystemEntities();
+
+		for (auto a = entities.begin(); a != entities.end(); a++)
+		{
+			a->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities.clear();
+			a->GetComponent<ColliderComponent>().CollideInfo.IsCollided = false;
+		}
+
 		for (auto a = entities.begin(); a != entities.end(); a++)
 		{
 			for (auto b = a; b != entities.end(); b++)
@@ -35,8 +42,32 @@ public:
 
 				if (Collided)
 				{
-					Logger::Log("Entity: " + std::to_string(a->GetId()) + " collided with Entity: " + std::to_string(b->GetId()));
+					a->GetComponent<ColliderComponent>().CollideInfo.IsCollided = true;
+					a->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities.push_back(*b);
+					b->GetComponent<ColliderComponent>().CollideInfo.IsCollided = true;
+					b->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities.push_back(*a);
+
+					// Logger::Log("Entity: " + std::to_string(a->GetId()) + " collided with Entity: " + std::to_string(b->GetId()));
 				}
+				else
+				{
+					auto& collideEntities = a->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities;
+					collideEntities.erase(
+						std::remove_if(
+							collideEntities.begin(),
+							collideEntities.end(),
+								[&](Entity other) {
+							return *b == other; }),
+						collideEntities.end());
+				}
+			}
+		}
+
+		for (auto a = entities.begin(); a != entities.end(); a++)
+		{
+			if (a->GetComponent<ColliderComponent>().CollideInfo.IsCollided)
+			{
+				Logger::Log("Entity: " + std::to_string(a->GetId()) + " collided with Entities " + std::to_string(a->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities.size()));
 			}
 		}
 	}

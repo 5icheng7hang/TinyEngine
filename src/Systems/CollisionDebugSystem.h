@@ -28,7 +28,9 @@ public:
 				static_cast<int>(collider.width),
 				static_cast<int>(collider.height),
 			};
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+			entity.GetComponent<ColliderComponent>().CollideInfo.IsCollided ?
+				SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255) :
+				SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 			SDL_RenderDrawRect(renderer, &colliderRect);
 		}
 	}
