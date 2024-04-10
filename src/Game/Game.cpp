@@ -12,6 +12,7 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/DamageSystem.h"
 #include "../Systems/CollisionDebugSystem.h"
+#include "../Systems/InputSystem.h"
 #include "../AssetStore/Assetstore.h"
 
 #include <SDL.h>
@@ -80,14 +81,19 @@ void Game::ProcessInput()
                 isRunning = false;
                 break;
             case SDL_KEYDOWN:
-                if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) 
-                {
-                    isRunning = false;
-                }
-                if (sdlEvent.key.keysym.sym == SDLK_d)
-                {
-                    isDebug = !isDebug;
-                }
+				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) 
+				{
+				    isRunning = false;
+				}
+				if (sdlEvent.key.keysym.sym == SDLK_d)
+				{
+				    isDebug = !isDebug;
+				}
+                eventBus->EmitEvent<KeyboardInputEvent>(static_cast<int>(sdlEvent.key.keysym.sym), KeyInputType::PRESSED);
+                break;
+
+            case SDL_KEYUP:
+                eventBus->EmitEvent<KeyboardInputEvent>(static_cast<int>(sdlEvent.key.keysym.sym), KeyInputType::RELEASED);
                 break;
         }
     }
@@ -102,6 +108,7 @@ void Game::LoadLevel(int LevelId)
     registry->AddSystem<CollisionSystem>();
     registry->AddSystem<CollisionDebugSystem>();
     registry->AddSystem<DamageSystem>();
+    registry->AddSystem<InputSystem>();
 
 	// Add assets to asset store
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -207,7 +214,7 @@ void Game::Update()
     eventBus->Reset();
 
     registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
-
+    registry->GetSystem<InputSystem>().SubscribeToEvents(eventBus);
 
     // update registry to process entities waiting to be created or deleted
     registry->Update();
