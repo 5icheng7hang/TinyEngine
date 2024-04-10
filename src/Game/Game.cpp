@@ -89,11 +89,11 @@ void Game::ProcessInput()
 				{
 				    isDebug = !isDebug;
 				}
-                eventBus->EmitEvent<KeyboardInputEvent>(static_cast<int>(sdlEvent.key.keysym.sym), KeyInputType::PRESSED);
+                eventBus->EmitEvent<KeyboardInputEvent>(sdlEvent.key.keysym.sym, KeyInputType::PRESSED);
                 break;
 
             case SDL_KEYUP:
-                eventBus->EmitEvent<KeyboardInputEvent>(static_cast<int>(sdlEvent.key.keysym.sym), KeyInputType::RELEASED);
+                eventBus->EmitEvent<KeyboardInputEvent>(sdlEvent.key.keysym.sym, KeyInputType::RELEASED);
                 break;
         }
     }

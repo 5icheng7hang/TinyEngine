@@ -15,7 +15,7 @@ enum class KeyInputType
 class KeyboardInputEvent : public Event
 {
 public:
-	int Key;
+	SDL_Keycode Key;
 	KeyInputType InputType;
-	KeyboardInputEvent(int key, KeyInputType type) : Key(key), InputType(type) {}
+	KeyboardInputEvent(SDL_Keycode key, KeyInputType type) : Key(key), InputType(type) {}
 };
