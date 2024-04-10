@@ -10,6 +10,7 @@
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
+#include "../Systems/DamageSystem.h"
 #include "../Systems/CollisionDebugSystem.h"
 #include "../AssetStore/Assetstore.h"
 
@@ -22,8 +23,10 @@
 Game::Game() 
 {
     isRunning = false;
+    
     registry = std::make_unique<Registry>();
     assetStore = std::make_unique<AssetStore>();
+    eventBus = std::make_unique<EventBus>();
 
     Logger::Log("Game constructor called!");
 }
@@ -98,6 +101,7 @@ void Game::LoadLevel(int LevelId)
     registry->AddSystem<AnimationSystem>();
     registry->AddSystem<CollisionSystem>();
     registry->AddSystem<CollisionDebugSystem>();
+    registry->AddSystem<DamageSystem>();
 
 	// Add assets to asset store
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -148,7 +152,7 @@ void Game::LoadLevel(int LevelId)
 
     Entity chopper = registry->CreateEntity();
     Entity chopper2 = registry->CreateEntity();
-    Entity CollisionArea = registry->CreateEntity();
+    // Entity CollisionArea = registry->CreateEntity();
     Entity radar = registry->CreateEntity();
 
     // init components.
@@ -164,8 +168,8 @@ void Game::LoadLevel(int LevelId)
     chopper2.AddComponent<AnimationComponent>(2, 5, true);
     chopper2.AddComponent<ColliderComponent>(10, 10);
 
-    CollisionArea.AddComponent<TransformComponent>(glm::vec2(200.f, 30.f), glm::vec2(20.f, 20.f), 0.f);
-    CollisionArea.AddComponent<ColliderComponent>(200, 20);
+    //CollisionArea.AddComponent<TransformComponent>(glm::vec2(200.f, 30.f), glm::vec2(20.f, 20.f), 0.f);
+    //CollisionArea.AddComponent<ColliderComponent>(200, 20);
 
 	radar.AddComponent<TransformComponent>(glm::vec2(500, 300.f), glm::vec2(1.f, 1.f));
 	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.f, 0.f));
@@ -197,6 +201,14 @@ void Game::Update()
     // Store the "previous" frame time
     millisecsPreviousFrame = SDL_GetTicks();
 
+
+
+    // subscription
+    eventBus->Reset();
+
+    registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+
+
     // update registry to process entities waiting to be created or deleted
     registry->Update();
 
@@ -204,7 +216,7 @@ void Game::Update()
 	// TODO: Update all system.
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
     registry->GetSystem<AnimationSystem>().Update();
-    registry->GetSystem<CollisionSystem>().Update();
+    registry->GetSystem<CollisionSystem>().Update(eventBus);
 }
 
 void Game::Render() 

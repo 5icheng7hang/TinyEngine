@@ -3,6 +3,7 @@
 #include "../ECS/ECS.h"
 #include "../Components/ColliderComponent.h"
 #include "../Components/TransformComponent.h"
+#include "../Events/CollisionEvent.h"
 #include <SDL.h>
 
 class CollisionSystem : public System
@@ -14,7 +15,7 @@ public:
 		RequireComponent<TransformComponent>();
 	}
 
-	void Update() 
+	void Update(std::unique_ptr<EventBus>& eventBus) 
 	{
 		auto entities = GetSystemEntities();
 
@@ -48,6 +49,8 @@ public:
 					b->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities.push_back(*a);
 
 					// Logger::Log("Entity: " + std::to_string(a->GetId()) + " collided with Entity: " + std::to_string(b->GetId()));
+
+
 				}
 				else
 				{
@@ -67,7 +70,9 @@ public:
 		{
 			if (a->GetComponent<ColliderComponent>().CollideInfo.IsCollided)
 			{
-				Logger::Log("Entity: " + std::to_string(a->GetId()) + " collided with Entities " + std::to_string(a->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities.size()));
+				// Logger::Log("Entity: " + std::to_string(a->GetId()) + " collided with Entities " + std::to_string(a->GetComponent<ColliderComponent>().CollideInfo.CollidingEntities.size()));
+
+				eventBus->EmitEvent<CollisionEvent>(a->GetComponent<ColliderComponent>().CollideInfo);
 			}
 		}
 	}
