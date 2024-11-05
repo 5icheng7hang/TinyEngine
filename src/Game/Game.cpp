@@ -20,6 +20,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 #include <fstream>
+#include "../Components/InputControlComponent.h"
 
 Game::Game() 
 {
@@ -113,7 +114,7 @@ void Game::LoadLevel(int LevelId)
 	// Add assets to asset store
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
-    assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper.png");
+    assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
 	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 
 
@@ -168,6 +169,8 @@ void Game::LoadLevel(int LevelId)
     chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 5);
     chopper.AddComponent<AnimationComponent>(2, 5,  true);
     chopper.AddComponent<ColliderComponent>(10, 10);
+    chopper.AddComponent<InputControlComponent>(glm::vec2(0,-20), glm::vec2(20, 0), glm::vec2(0, 20), glm::vec2(-20, 0));
+
 
     chopper2.AddComponent<TransformComponent>(glm::vec2(500.f, 30.f), glm::vec2(3.f, 3.f), 0.f);
     chopper2.AddComponent<RigidBodyComponent>(glm::vec2(-20.f, 0.f));

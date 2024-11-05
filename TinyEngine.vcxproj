@@ -393,6 +393,7 @@
     <ClInclude Include="src\AssetStore\Assetstore.h" />
     <ClInclude Include="src\Components\AnimationComponent.h" />
     <ClInclude Include="src\Components\ColliderComponent.h" />
+    <ClInclude Include="src\Components\InputControlComponent.h" />
     <ClInclude Include="src\Components\RigidBodyComponent.h" />
     <ClInclude Include="src\Components\SpriteComponent.h" />
     <ClInclude Include="src\Components\TransformComponent.h" />
